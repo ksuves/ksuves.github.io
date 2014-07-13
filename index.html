@@ -47,7 +47,7 @@ function updateNums(){
 	}
         document.getElementById('mess').innerHTML = mess;
 
-	var delta = (Math.floor(timeX.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose-uldelta;
+	var delta = (Math.floor(timeX.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000)-1)*openHours*3600*1000+timeUntilClose-uldelta;
 	var deltaHours = delta/3600/1000;
 
 	var freq = deltaHours/NUM;
