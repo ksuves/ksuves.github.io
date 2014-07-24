@@ -16,6 +16,11 @@
         var openHour = 8;
         var openHours = closeHour - openHour;
 
+function datize(date){
+        return new Date(date.getYear()+1900, date.getMonth(), date.getDate());
+}
+
+
 function updateNums(){
 
 	var uldelta = 0;
@@ -41,13 +46,13 @@ function updateNums(){
 		uldelta = 3*openHours*3600*1000;
 	}else{
 		if(now<ultimeEnd){
-			uldelta=(Math.floor(ultimeEnd.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose;
+			uldelta=(Math.floor(datize(ultimeEnd).getTime()/24/3600/1000)-Math.floor(datize(now).getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose;
 			var mess = "Сейчас ты на Ulcamp, отдыхай! :)"
 		}
 	}
         document.getElementById('mess').innerHTML = mess;
 
-	var delta = (Math.floor(timeX.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose-uldelta;
+	var delta = (Math.floor(datize(timeX).getTime()/24/3600/1000)-Math.floor(datize(now).getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose-uldelta;
 	var deltaHours = delta/3600/1000;
 
 	var freq = deltaHours/NUM;
