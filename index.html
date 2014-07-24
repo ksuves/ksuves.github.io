@@ -22,7 +22,7 @@ function updateNums(){
 	var now = new Date();
 	var closeToday = new Date(now.getYear()+1900, now.getMonth(), now.getDate(), closeHour);
 	var nowHour = now.getHours();
-	var timeUntilClose = openHours*3600*1000;
+	var timeUntilClose = 0;
 	var messClose = "Сейчас отдыхай, батутный центр закрыт, но до его открытия осталось ";
 	var tomorrow = new Date(now.getTime()+24*3600*1000);
 	var openTime = new Date(tomorrow.getYear()+1900, tomorrow.getMonth(), tomorrow.getDate(), openHour);
@@ -41,13 +41,13 @@ function updateNums(){
 		uldelta = 3*openHours*3600*1000;
 	}else{
 		if(now<ultimeEnd){
-			uldelta=(Math.floor(ultimeEnd.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000)-1)*openHours*3600*1000+timeUntilClose;
+			uldelta=(Math.floor(ultimeEnd.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose;
 			var mess = "Сейчас ты на Ulcamp, отдыхай! :)"
 		}
 	}
         document.getElementById('mess').innerHTML = mess;
 
-	var delta = (Math.floor(timeX.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000)-1)*openHours*3600*1000+timeUntilClose-uldelta;
+	var delta = (Math.floor(timeX.getTime()/24/3600/1000)-Math.floor(now.getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose-uldelta;
 	var deltaHours = delta/3600/1000;
 
 	var freq = deltaHours/NUM;
