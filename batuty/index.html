@@ -1,0 +1,83 @@
+<html>
+<body>
+
+<center>
+Ксюша, у тебя осталось <b id='NUM'>0</b> посещений батутного центра, которые необходимо израсходывать за <b id='hours'>считаем...</b> часов работы центра.<br>
+Тебе необходимо посещать батуты всреднем раз в <b id='freq'>подсчёт...</b> часов.<br>
+<b>Ксюша, ты - молодец! :)</b>
+<font id='mess'></font>
+</center>
+
+<script>
+        var NUM = document.getElementById('NUM').innerHTML;
+        var ultimeStart = new Date("2014/07/18 08:00");
+        var ultimeEnd = new Date("2014/07/20 22:00"); 
+        var timeX = new Date("2014/07/26 22:00");
+        var closeHour = 22;
+        var openHour = 8;
+        var openHours = closeHour - openHour;
+
+function datize(date){
+        return new Date(date.getYear()+1900, date.getMonth(), date.getDate());
+}
+
+
+function updateNums(){
+
+	var uldelta = 0;
+	var now = new Date();
+	var closeToday = new Date(now.getYear()+1900, now.getMonth(), now.getDate(), closeHour);
+	var nowHour = now.getHours();
+	var timeUntilClose = 0;
+	var messClose = "Сейчас отдыхай, батутный центр закрыт, но до его открытия осталось ";
+	var tomorrow = new Date(now.getTime()+24*3600*1000);
+	var openTime = new Date(tomorrow.getYear()+1900, tomorrow.getMonth(), tomorrow.getDate(), openHour);
+	var mess = messClose + timeToEvent(openTime);
+	if (nowHour<openHour) {
+		timeUntilClose = openHours*3600*1000;
+		openTime = new Date(now.getYear()+1900, now.getMonth(), now.getDate(), openHour);
+		mess = messClose + timeToEvent(openTime);		
+	}else{
+		if(nowHour<closeHour){
+			timeUntilClose = closeToday.getTime()-now.getTime();
+			mess = "";
+		}
+	}
+	if ( now<ultimeStart ){
+		uldelta = 3*openHours*3600*1000;
+	}else{
+		if(now<ultimeEnd){
+			uldelta=(Math.floor(datize(ultimeEnd).getTime()/24/3600/1000)-Math.floor(datize(now).getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose;
+			var mess = "Сейчас ты на Ulcamp, отдыхай! :)"
+		}
+	}
+        document.getElementById('mess').innerHTML = mess;
+
+	var delta = (Math.floor(datize(timeX).getTime()/24/3600/1000)-Math.floor(datize(now).getTime()/24/3600/1000))*openHours*3600*1000+timeUntilClose-uldelta;
+	var deltaHours = delta/3600/1000;
+
+	var freq = deltaHours/NUM;
+
+//document.write(delta/3600/1000);
+ 
+	document.getElementById('hours').innerHTML = deltaHours.toFixed(4);
+	document.getElementById('freq').innerHTML = freq.toFixed(4);
+
+}
+
+updateNums();
+setInterval(updateNums, 500);
+
+function timeToEvent(eventDate) {
+    today = new Date();
+    today = Math.floor((eventDate-today)/1000);
+    tsec=today%60; today=Math.floor(today/60); if(tsec<10)tsec='0'+tsec;
+    tmin=today%60; today=Math.floor(today/60); if(tmin<10)tmin='0'+tmin;
+    thour=today%24; today=Math.floor(today/24);
+    timestr="<b>"+ thour+"</b> часов <b>"+tmin+"</b> минут <b>"+tsec+"</b> секунд";
+    return timestr;
+}
+
+</script>
+</body>
+</html>
