@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пасхальные яйца (Easter Eggs)</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background-color: #f9f9f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    #main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #pagepath {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    #pagepath a {
+      text-decoration: none;
+      color: #0066cc;
+    }
+    #ctxtnav {
+      background: #eee;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+    }
+    #ctxtnav h2 {
+      margin-top: 0;
+      font-size: 1em;
+    }
+    #ctxtnav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+    }
+    #ctxtnav li a {
+      text-decoration: none;
+      color: #0066cc;
+    }
+    pre {
+      background: #f3f3f3;
+      border-left: 3px solid #ccc;
+      padding: 10px;
+      overflow-x: auto;
+      font-family: Consolas, monospace;
+    }
+    ol, ul {
+      margin-left: 25px;
+    }
+    .loweralpha { list-style-type: lower-alpha; }
+    .wiki { font-size: 1em; }
+    .trac-modifiedby {
+      font-size: 0.85em;
+      color: #555;
+      border-top: 1px solid #ddd;
+      margin-top: 30px;
+      padding-top: 10px;
+    }
+    .trac-help {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 20px;
+      background: #f7f7f7;
+      border-left: 3px solid #ccc;
+      padding: 10px;
+    }
+    #altlinks {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      font-size: 0.9em;
+    }
+    a {
+      color: #0066cc;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div id="main">
+
+  <div id="pagepath" class="noprint">
+    <a class="pathentry first" href="#">wiki:</a>
+    <a href="#">Misc</a> /
+    <a href="#">EasterEggs</a>
+  </div>
+
+  <div id="ctxtnav" class="nav">
+    <h2>Context Navigation</h2>
+    <ul>
+      <li><a href="#">Up</a></li>
+      <li><a href="#">Start Page</a></li>
+      <li><a href="#">Index</a></li>
+      <li><a href="#">History</a></li>
+    </ul>
+    <hr>
+  </div>
+
+  <div id="content" class="wiki narrow">
+    <div class="wikipage searchable">
+      <div id="wikipage" class="trac-content borderless">
+        <p>
+        «Пасхальное яйцо» (англ. <i>Easter Egg</i>, сленговое пасхалка) — разновидность секрета, оставляемого в игре, фильме или программном обеспечении создателями. Отличие пасхального яйца в игре от обычного игрового секрета состоит в том, что его содержание, как правило, не вписывается в общую концепцию, выглядит в контексте неправдоподобно, нелепо, и зачастую является внешней ссылкой. Пасхальные яйца играют роль своеобразных шуток для внимательных игроков или зрителей.
+        </p>
+        <p>(с) Википедия.</p>
+
+        <ol>
+          <li>
+            Бегунок подсчета зависимостей пакета в /etc/make.conf
+            <pre>FEATURES="candy"</pre>
+          </li>
+
+          <li>
+            <b>emerge -v moo</b><br>
+            Можно поставить пакет cowsay или xcowsay — его иксовый аналог.
+            ...
+            <pre>apt, beavis.zen, bong, bud-frogs, bunny, cheese, ...</pre>
+          </li>
+
+          <li>
+            Если в гноме нажать Alt+F2 и набрать <code>free the fish</code>, то появится рыбка.
+          </li>
+
+          <li>
+            В OpenOffice "Звездные войны" вызываются следующим образом:
+            <ol class="loweralpha">
+              <li>Открываем Calc.</li>
+              <li>Вставляем формулу:
+                <pre>=GAME("StarWars")</pre>
+                и нажимаем Enter.
+              </li>
+            </ol>
+          </li>
+
+          <li>
+            Зайдите в Firefox по адресу <code>about:mozilla</code>.
+          </li>
+
+          <li>
+            Пьяные цвета: попробуйте использовать такие слова в HTML как <code>#beer</code>, <code>#vodka</code>, <code>#tequila</code> и т.д.
+          </li>
+
+          <li>
+            Создайте учетную запись с логином <b>tyler</b> и введите <code>reboot</code> — увидите сообщение:
+            <pre>"Oh hello
+Mr. Tyler - going DOWN?"</pre>
+          </li>
+
+          <li>
+            В GDM можно ввести:
+            <pre>Start Dancing</pre>
+            Остановить — <pre>Stop Dancing</pre>
+          </li>
+
+          <li>
+            Пасхалки vim:
+            <pre>:help 42</pre>
+            <pre>What is the meaning of life...?</pre>
+          </li>
+
+          <li>
+            Магия чисел:
+            <pre>$ grep LINUX_REBOOT_MAGIC /usr/include/linux/*.h</pre>
+            <pre>#define LINUX_REBOOT_MAGIC1 0xfee1dead</pre>
+          </li>
+
+          <li>
+            В терминале пишем:
+            <pre>$ ddate
+Today is Prickle-Prickle, the 54th day of Chaos in the YOLD 3177
+</pre>
+          </li>
+        </ol>
+
+        <p>Вот как-то так, все, что пока удалось собрать :)</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
+
