@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Авторизация в системе через LDAP</title>
+<style>
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: #fcfcfc;
+    color: #222;
+    line-height: 1.6;
+    margin: 0;
+    padding: 2em;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1, h2, h3 {
+    color: #333;
+  }
+  a {
+    color: #005b99;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  ol {
+    padding-left: 1.5em;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1em;
+    overflow-x: auto;
+  }
+  code {
+    background: #f4f4f4;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+  }
+  strong {
+    color: #000;
+  }
+  .note {
+    border-left: 4px solid #008080;
+    background: #e8f6f6;
+    padding: 1em;
+    margin: 1em 0;
+  }
+  footer {
+    font-size: 0.9em;
+    color: #555;
+    border-top: 1px solid #ddd;
+    margin-top: 2em;
+    padding-top: 1em;
+  }
+</style>
+</head>
+<body>
+
+<h1>Авторизация в системе через LDAP</h1>
+
+<p>Задача — сделать возможным вход и работу в системе пользователей, существующих только в базе LDAP.<br>
+Необходимые пакеты: <code>nss_ldap</code> и <code>pam_ldap</code>.</p>
+
+<p>Прежде всего нужно определить запросы к LDAP-серверу.  
+Рассмотрим две реализации: <strong>OpenLDAP</strong> и <strong>Active Directory</strong>.</p>
+
+<ol>
+<li>
+  <h3>OpenLDAP</h3>
+  <p>Запросы к серверу будут выглядеть как <code>(&amp;(objectClass=posixAccount)(uid=test))</code>.  
+  Чтобы избежать ошибок индексирования, в <strong>/etc/openldap/slapd.conf</strong> на стороне сервера необходимо добавить:</p>
+
+  <pre><code>index uid pres,eq,sub
+</code></pre>
+
+  <p>Теперь определим клиентский <strong>/etc/ldap.conf</strong>:</p>
+
+  <pre><code>host example.com
+base dc=local,dc=ru
+uri ldap://example.com:389/
+ldap_version 3
+
+binddn cn=admin,dc=local,dc=ru
+bindpw password 
+
+scope one
+
+timelimit 30
+bind_timelimit 30
+bind_policy soft
+nss_connect_policy persist
+
+pam_password md5
+pam_filter objectclass=posixAccount
+pam_login_attribute uid
+pam_member_attribute gid
+
+nss_base_passwd ou=Users,dc=local,dc=ru
+nss_base_shadow ou=Users,dc=local,dc=ru
+nss_base_group  ou=Group,dc=local,dc=ru
+
+nss_reconnect_tries 4
+nss_reconnect_sleeptime 1
+nss_reconnect_maxsleeptime 16
+nss_reconnect_maxconntries 2
+</code></pre>
+
+  <p>Пример файла <strong>LDIF</strong> для создания пользователя на сервере:</p>
+
+  <pre><code>dn: uid=test,ou=Users,dc=local,dc=ru
+uid: test
+cn: test
+objectclass: account
+objectclass: posixAccount
+objectclass: top
+loginshell: /bin/bash
+uidnumber: 2004
+gidnumber: 2004
+homedirectory: /home/test_directory
+gecos: test
+userpassword: {MD5}CY9rzUYh03PK3k6DJie09g==
+</code></pre>
+
+  <p>После этого запись о пользователе будет определяться как:</p>
+  <p><code>test:*:2004:2004:test:/home/test_directory:/bin/bash</code></p>
+</li>
+
+<li>
+  <h3>Active Directory</h3>
+
+  <p>В данном случае <strong>/etc/ldap.conf</strong> будет выглядеть так:</p>
+
+  <pre><code>host example.com
+base dc=local,dc=ru
+uri ldap://example.com
+ldap_version 3
+
+binddn cn=admin,dc=local,dc=ru
+bindpw password
+
+nss_map_objectclass posixAccount user
+nss_map_objectclass shadowAccount user
+nss_map_attribute uid msSFU30Name
+nss_map_attribute uidNumber uidNumber
+nss_map_attribute gidNumber gidNumber
+nss_map_attribute homeDirectory unixHomeDirectory
+nss_map_attributes loginShell loginShell
+nss_map_objectclass posixGroup primaryGroupID
+pam_login_attribute msSFU30Name
+pam_filter objectclass=user
+pam_password ad
+sasl_secprops maxssf=0
+</code></pre>
+</li>
+</ol>
+
+<h3>Настройка NSS</h3>
+
+<p>В файле <strong>/etc/nsswitch.conf</strong> нужно указать, что пользователей следует брать и из LDAP:</p>
+
+<pre><code>passwd:      compat ldap
+shadow:      compat ldap
+group:       compat ldap
+</code></pre>
+
+<p>Теперь команда <code>getent passwd</code> должна показывать пользователей, существующих как в локальной системе, так и в базе LDAP.</p>
+
+<h3>Настройка PAM</h3>
+
+<p>Осталось связать LDAP-пользователей с авторизацией в системе. Это выполняется с помощью файла <strong>/etc/pam.d/system-auth</strong>.</p>
+
+<div class="note">
+  ⚠️ <strong>Внимание:</strong> порядок строк в этом файле имеет значение!
+</div>
+
+<p>Пример полного содержимого:</p>
+
+<pre><code>auth            required        pam_env.so
+auth            sufficient      pam_ssh.so
+auth            sufficient      pam_unix.so try_first_pass likeauth nullok
+auth            sufficient      pam_ldap.so use_first_pass
+auth            required        pam_deny.so
+
+account         required        pam_unix.so
+account         [default=bad success=ok user_unknown=ignore]      pam_ldap.so
+
+password        required        pam_cracklib.so difok=2 minlen=8 dcredit=2 ocredit=2 retry=3
+password        required        pam_unix.so try_first_pass use_authtok nullok sha512 shadow
+password        sufficient      pam_ldap.so use_authtok
+password        required        pam_deny.so
+
+session         optional        pam_ssh.so
+session         required        pam_limits.so
+session         required        pam_env.so
+session         required        pam_unix.so
+session         optional        pam_permit.so
+session         required        pam_mkhomedir.so skel=/etc/skel/ umask=0
+session         optional        pam_ldap.so
+</code></pre>
+
+</body>
+</html>
+

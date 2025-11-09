@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>PolicyKit — настройка прав доступа</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background-color: #f9f9f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    #main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #pagepath {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    #pagepath a {
+      text-decoration: none;
+      color: #0066cc;
+    }
+    #ctxtnav {
+      background: #eee;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+    }
+    #ctxtnav h2 {
+      margin-top: 0;
+      font-size: 1em;
+    }
+    #ctxtnav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+    }
+    #ctxtnav li a {
+      text-decoration: none;
+      color: #0066cc;
+    }
+    pre {
+      background: #f3f3f3;
+      border-left: 3px solid #ccc;
+      padding: 10px;
+      overflow-x: auto;
+      font-family: Consolas, monospace;
+      font-size: 0.95em;
+    }
+    ol, ul {
+      margin-left: 25px;
+    }
+    .wiki h3, .wiki h4 {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      margin-top: 1.4em;
+      color: #333;
+    }
+    .trac-modifiedby {
+      font-size: 0.85em;
+      color: #555;
+      border-top: 1px solid #ddd;
+      margin-top: 30px;
+      padding-top: 10px;
+    }
+    .trac-help {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 20px;
+      background: #f7f7f7;
+      border-left: 3px solid #ccc;
+      padding: 10px;
+    }
+    #altlinks {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      font-size: 0.9em;
+    }
+    a {
+      color: #0066cc;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    code {
+      background: #f3f3f3;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: Consolas, monospace;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+<div id="main">
+
+  <div id="pagepath" class="noprint">
+    <a class="pathentry first" href="#">wiki:</a>
+    <a href="#">OsP</a> /
+    <a href="#">Linux</a> /
+    <a href="#">Polkit</a>
+  </div>
+
+  <div id="ctxtnav" class="nav">
+    <h2>Context Navigation</h2>
+    <ul>
+      <li><a href="#">Up</a></li>
+      <li><a href="#">Start Page</a></li>
+      <li><a href="#">Index</a></li>
+      <li><a href="#">History</a></li>
+    </ul>
+    <hr>
+  </div>
+
+  <div id="content" class="wiki narrow">
+    <div class="wikipage searchable">
+      <div id="wikipage" class="trac-content borderless">
+
+        <h3 id="PolicyKit">PolicyKit</h3>
+        <p>Задача — разрешить монтирование USB и ребут бурундуков только определённой администратором системы группе пользователей.</p>
+
+        <p>Событие для установления прав авторизации PolicyKit определяет как <em>action</em>, у которого есть имя <code>id</code>. Основные правила для них хранятся в <code>/usr/share/polkit-1/actions/</code> и называются <code>org.freedesktop.*</code>. Например, блок, отвечающий за монтирование USB, находится в <code>org.freedesktop.udisks.policy</code> и выглядит так:</p>
+
+<pre>&lt;action id="org.freedesktop.udisks.filesystem-mount"&gt;
+  &lt;description&gt;Mount a device&lt;/description&gt;
+  &lt;message&gt;Authentication is required to mount the device&lt;/message&gt;
+  &lt;defaults&gt;
+    &lt;allow_any&gt;no&lt;/allow_any&gt;
+    &lt;allow_inactive&gt;no&lt;/allow_inactive&gt;
+    &lt;allow_active&gt;auth_admin&lt;/allow_active&gt;
+  &lt;/defaults&gt;
+&lt;/action&gt;
+</pre>
+
+        <p>Правила авторизации определяются несколькими путями: <code>yes</code>, <code>no</code>, <code>auth_admin</code>, <code>auth_admin_keep</code> (последнее сохраняет подтверждение на некоторое время).  
+        Группа <code>admin</code> определяется в конфиге <code>/etc/polkit-1/localauthority.conf.d/50-localauthority.conf</code> и задаётся объединением пользователей и групп, например <code>unix-user:testuser;unix-group:testgroup</code>.  
+        По умолчанию — <code>root</code>.  
+        Для <code>auth_admin</code> потребуется выбрать пользователя и ввести его пароль. Чтобы определённым пользователям не требовалось подтверждение, можно перегрузить правило.</p>
+
+        <p>Создаём файл <code>/etc/polkit-1/localauthority/50-local.d/50-local-fs-mount.pkla</code>:</p>
+
+<pre>[admin mount permissions]
+Identity=unix-group:testgroup;unix-user:testuser
+Action=org.freedesktop.udisks.filesystem-mount
+ResultAny=no
+ResultInactive=no
+ResultActive=yes
+</pre>
+
+        <p>Теперь пользователи группы <code>testgroup</code> и пользователь <code>testuser</code> могут монтировать USB без пароля.  
+        Для остальных действует базовое правило из <code>/usr/share/polkit-1/actions/org.freedesktop.udisks.policy</code>.</p>
+
+        <p>Структура директорий для файлов <code>pkla</code> следующая:</p>
+
+<pre>/var/lib/polkit-1/
+    └── localauthority
+        ├── 10-vendor.d
+        ├── 20-org.d
+        ├── 30-site.d
+        ├── 50-local.d
+        └── 90-mandatory.d
+
+/etc/polkit-1/
+    └── localauthority
+        ├── 10-vendor.d
+        ├── 20-org.d
+        ├── 30-site.d
+        ├── 50-local.d
+        └── 90-mandatory.d
+</pre>
+
+        <p>Порядок применения идёт сверху вниз: последними применяются правила из <code>/etc/polkit-1/localauthority/90-mandatory.d</code>.</p>
+
+        <p><strong>З.Ы.</strong> Для правил выключения и ребута смотрите <code>/usr/share/polkit-1/actions/org.freedesktop.consolekit.policy</code>.</p>
+
+        <p><strong>З.Ы.Ы.</strong> Всё решается аналогично: создаём файл  
+        <code>/var/lib/polkit-1/localauthority/50-local.d/60-local-system.pkla</code> со следующим содержимым:</p>
+
+<pre>[allow to shutdown and reboot]
+Identity=unix-group:testgroup
+Action=org.freedesktop.consolekit.system.*
+ResultAny=no
+ResultInactive=no
+ResultActive=yes
+</pre>
+
+        <p>Теперь пользователи группы <code>testgroup</code> могут выключать и перезагружать систему, для остальных это запрещено (значок выключения в KDE также исчезает).</p>
+        <p><strong>Ура!</strong></p>
+
+        <h4 id="LibvirtExample">Пример Polkit для Libvirt</h4>
+
+        <p>Файл: <code>/etc/polkit-1/localauthority/50-local.d/50-org.libvirt.unix.manage.pkla</code></p>
+
+<pre>[libvirt Management Access]
+Identity=unix-group:libvirt
+Action=org.libvirt.unix.manage
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+</pre>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
+

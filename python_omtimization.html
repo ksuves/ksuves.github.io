@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оптимизация кода на Python</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.6;
+    background: #f9f9f9;
+    color: #222;
+    margin: 0;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    color: #444;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+  }
+  ol, ul {
+    padding-left: 22px;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  a {
+    color: #0645ad;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .trac-modifiedby {
+    font-size: 0.9em;
+    color: #666;
+    border-top: 1px solid #ddd;
+    margin-top: 30px;
+    padding-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage searchable">
+  <div id="wikipage" class="trac-content borderless">
+    <h3 id="ОптимизациякоданаPython">Оптимизация кода на Python</h3>
+
+    <p>Естественно, самым эффективным будет оптимизация алгоритма, но это индивидуально, примером тому <a href="https://mexmat.sgu.ru/lab-mc/blog/python_max_optimization">пост</a>, посему имеет смысл привести общие советы:</p>
+
+    <ol>
+      <li>Сокращение повторений операций. Например:
+        <pre>for i in range(n):
+    for j in range(n):
+        if (i * j &lt; 200):
+            p = i * j
+</pre>
+        можно ускорить как:
+        <pre>for i in range(n):
+    for j in range(n):
+        tmp = i * j
+        if (tmp &lt; 200):
+            p = tmp
+</pre>
+      </li>
+
+      <li>Помним, что Python обладает сокращенной моделью вычисления условий. То есть, если на некотором этапе условной конструкции уже можно дать ответ, остальную часть конструкции он выполнять не будет. Например:
+        <pre>for i in range(n):
+    for j in range(n):
+        if (a[i][i]*n != 100 and i &lt; j):
+            count = 0
+</pre>
+        можно значительно перестановкой условий, ибо первое затратно на вычисления:
+        <pre>for i in range(n):
+    for j in range(n):
+        if (i &lt; j and a[i][i]*n != 100):
+            count = 0
+</pre>
+      </li>
+
+      <li>При оптимизации полезен модуль <b>profile</b>. С помощью его можно получать статистику вызывов функций и времени выполнения. Таким образом, он поможет найти "узкие" места алгоритма. Иногда сии манипуляции называют "профилирование". Пример использования:
+        <pre>import profile
+profile.run('main()')</pre>
+      </li>
+    </ol>
+
+    <p>Далее поговорим про особенности непосредственно языка, их оптимизацией также можно добиться поразительных результатов.</p>
+
+    <ol start="4">
+      <li>Иногда для часто вызываемых встроенных функций удобно создать псевдоним в локальном пространстве функции:
+        <pre>temp =''
+for i in range(n):
+    for j in range(n):
+        temp += str(a[i][j])
+</pre>
+        можно ускорить:
+        <pre>lstr = str
+temp =''
+for i in range(n):
+    for j in range(n):
+        temp += lstr(a[i][j])
+</pre>
+      </li>
+
+      <li>Пользуйтесь по возможности <code>xrange</code> вместо <code>range</code> — он более бережно использует память.</li>
+
+      <li>Вынос основного кода python в отдельную функцию помогает интерпретатору python лучше проводить внутренние оптимизации:
+        <pre>n = 400
+A = init_A(n)
+for i in range(n):
+        A[i][i] *= n * n
+B = init_B(n)
+printToFile(A,B,n)
+</pre>
+        работает быстрее, если переписать:
+        <pre>def run():
+    n = 400
+    A = init_A(n)
+    for i in range(n):
+        A[i][i] *= n * n
+    B = init_B(n)
+    printToFile(A,B,n)
+
+run()</pre>
+      </li>
+
+      <li>Работа с глобальными переменными медленней работы с локальными.</li>
+      <li>Импорт объектов также лучше делать в локальном пространстве функции.</li>
+      <li>Пользуйтесь встроенными функциями — многие написаны на C и работают быстрее.</li>
+      <li>Заменяйте "общие" функции на конкретные:
+        <pre>p = math.sqrt(x ** 2 + y ** 2)</pre>
+        на
+        <pre>p = math.sqrt(x * x + y * y)</pre>
+      </li>
+      <li>Заменяйте цикл <code>for</code> на <code>map()</code> где возможно — она написана на C.</li>
+      <li>При работе с большими массивами чисел используйте <b>NumPy</b>. Для линейной алгебры полезно использовать ATLAS — результаты потрясающие. Подробнее <a href="http://www.undefined.org.ua/2010/01/gentoo-tip-numpy-25.html">тут</a>.</li>
+      <li>Старайтесь, чтобы функции обрабатывали агрегаторы данных:
+        <pre>for i in xrange(n):
+    func(a[i])</pre>
+        лучше заменить на:
+        <pre>func(a)</pre>
+      </li>
+      <li>Кортежи и списки: кортежи неизменяемы, списки — изменяемы. Если данные не будут меняться — используйте кортежи.</li>
+    </ol>
+
+    <p>В заключение — оптимизировать стоит уже готовый, отлаженный код. И не забывайте про JIT-компиляцию: отличная реализация для Python — <b>PyPy</b>.</p>
+
+    <p>Почитать:<br>
+      <a href="http://wiki.python.org/moin/PythonSpeed">http://wiki.python.org/moin/PythonSpeed</a><br>
+      <a href="http://wiki.python.org/moin/PythonSpeed/PerformanceTips">http://wiki.python.org/moin/PythonSpeed/PerformanceTips</a>
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>
+

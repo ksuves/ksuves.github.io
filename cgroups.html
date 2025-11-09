@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cgroups — ограничение ресурсов процессов</title>
+<style>
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    background: #fdfdfd;
+    color: #222;
+    margin: 0;
+    padding: 2em;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1, h2, h3 {
+    color: #333;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 1em;
+    overflow-x: auto;
+    border-radius: 8px;
+  }
+  code {
+    background: #f4f4f4;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+  }
+  .note {
+    border-left: 4px solid #008080;
+    background: #e8f6f6;
+    padding: 0.8em 1em;
+    margin: 1em 0;
+  }
+  footer {
+    font-size: 0.9em;
+    color: #555;
+    border-top: 1px solid #ddd;
+    margin-top: 2em;
+    padding-top: 1em;
+  }
+</style>
+</head>
+<body>
+
+<h1>Cgroups — ограничение ресурсов процессов</h1>
+
+<p><strong>Cgroups</strong> — это механизм ограничения ресурсов процессов и их потомков.</p>
+
+<p><strong>Задача:</strong> ограничить количество памяти, занимаемое процессами, запущенными определённым пользователем (<code>testuser</code>).</p>
+
+<h2>1. Subsystem</h2>
+
+<p>В терминологии Cgroups существует понятие <em>subsystem</em> — критерий ограничения. В нашем случае он называется <code>memory</code>.</p>
+
+<h2>2. Проверка поддержки в ядре</h2>
+
+<p>Прежде всего, убедимся, что поддержка Cgroups включена в ядре:</p>
+
+<pre><code>astra linux # cat .config | grep -i cgroup
+CONFIG_CGROUPS=y
+# CONFIG_CGROUP_DEBUG is not set
+CONFIG_CGROUP_NS=y
+CONFIG_CGROUP_FREEZER=y
+CONFIG_CGROUP_DEVICE=y
+CONFIG_CGROUP_CPUACCT=y
+CONFIG_CGROUP_MEM_RES_CTLR=y
+# CONFIG_CGROUP_MEM_RES_CTLR_SWAP is not set
+CONFIG_CGROUP_SCHED=y
+CONFIG_BLK_CGROUP=y
+# CONFIG_DEBUG_BLK_CGROUP is not set
+</code></pre>
+
+<p>Также можно проверить активированные подсистемы:</p>
+
+<pre><code>astra linux # cat /proc/cgroups 
+#subsys_name    hierarchy    num_cgroups    enabled
+cpuset    0    1    1
+ns    0    1    1
+cpu    0    1    1
+cpuacct    0    1    1
+memory    0    1    1
+devices    0    1    1
+freezer    0    1    1
+blkio    0    1    1
+</code></pre>
+
+<h2>3. Настройка при запуске системы</h2>
+
+<p>Определим действия, выполняемые при старте системы:</p>
+
+<pre><code>astra linux # cat /etc/cgroup.sh 
+mkdir -p /dev/memory
+mount -t cgroup -o memory cgroup /dev/memory
+mkdir -m 0777 /dev/memory/denytest
+</code></pre>
+
+<p>Точка монтирования — <code>/dev/memory</code>, имя группы — <code>denytest</code>.</p>
+<p>В Cgroups реализовано наследование: все ограничения передаются потомкам.</p>
+
+<h2>4. Настройка пользователя</h2>
+
+<p>Добавим в файл <code>.bashrc</code> пользователя <code>testuser</code>:</p>
+
+<pre><code>if [ "$PS1" ] ; then
+    mkdir -m 0700 /dev/memory/denytest/$$
+    echo $$ > /dev/memory/denytest/$$/tasks
+    echo 134216704 > /dev/memory/denytest/$$/memory.limit_in_bytes
+fi
+</code></pre>
+
+<p>Число <code>134216704</code> соответствует 128 МБ — максимально разрешённому количеству памяти в байтах.  
+<code>$$</code> — PID текущего процесса.</p>
+
+<p>Теперь можно увидеть изменения в <code>/proc/cgroups</code>:</p>
+
+<pre><code>astra linux # cat /proc/cgroups 
+#subsys_name    hierarchy    num_cgroups    enabled
+cpuset    0    1    1
+ns    0    1    1
+cpu    0    1    1
+cpuacct    0    1    1
+memory    1    10    1
+devices    0    1    1
+freezer    0    1    1
+blkio    0    1    1
+</code></pre>
+
+<p>Таким образом, для пользователя <strong>testuser</strong> установлено ограничение в <strong>128 МБ</strong> оперативной памяти.</p>
+
+<h2>5. Примечание</h2>
+
+<p>Файл <code>.bashrc</code> можно изменять пользователем. Чтобы сделать настройку централизованной, можно поместить команды в <code>/etc/bash/bashrc</code> и добавить проверку:</p>
+
+<pre><code>CG_USER=`whoami`
+if [ "${CG_USER}" = "testuser" ] ...
+</code></pre>
+
+<div class="note">
+  💡 Таким образом можно задать автоматическое ограничение памяти для конкретного пользователя без изменения его личных файлов.
+</div>
+
+</body>
+</html>
+
