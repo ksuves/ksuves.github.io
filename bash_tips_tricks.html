@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Советы по истории команд bash</title>
+<style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background: #f9f9f9; color: #333; }
+    h1 { text-align: center; }
+    h2 { margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+    ul { list-style-type: none; padding-left: 0; }
+    li { margin: 5px 0; }
+    a { text-decoration: none; color: #1a0dab; }
+    a:hover { text-decoration: underline; }
+    footer { margin-top: 50px; text-align: center; font-size: 0.9em; color: #666; }
+</style>
+</head>
+<body>
+<p>Для новичков: bash — это стандартная командная оболочка во многих Linux-дистрибутивах, таких как Fedora, Ubuntu, Redhat и др. Если вы работаете в Linux, скорее всего, вы пользуетесь bash. Ниже приведены частые проблемы и простые решения.</p>
+
+<h2>1. История команд не обновляется</h2>
+<p>Если открыть несколько терминалов, команды из одного окна не появятся в другом, а при закрытии история может перезаписаться. Это связано с тем, что bash записывает историю только при выходе.</p>
+<p>Исправляется редактированием файла <code>.bashrc</code>:</p>
+<pre>nano ~/.bashrc</pre>
+<p>Добавьте строки:</p>
+<pre>shopt -s histappend
+PROMPT_COMMAND='history -a'</pre>
+<p>Теперь история будет добавляться к существующей и сохраняться при каждом отображении подсказки bash.</p>
+
+<h2>2. Исправление опечаток в командах</h2>
+<p>В <code>.bashrc</code> добавьте:</p>
+<pre>shopt -s cdspell</pre>
+<p>Ошибки в написании, например <code>ect</code> вместо <code>etc</code>, будут исправляться автоматически.</p>
+
+<h2>3. Удаление дубликатов из истории</h2>
+<p>Чтобы не дублировать одинаковые команды, например <code>cd ..</code>, добавьте:</p>
+<pre>export HISTCONTROL="ignoredups"</pre>
+<p>Или лучше:</p>
+<pre>export HISTIGNORE="&:ls:[bf]g:exit"</pre>
+<p>Это исключит дубликаты и ненужные команды вроде <code>ls</code>, <code>bg</code>, <code>fg</code> и <code>exit</code>.</p>
+
+<h2>4. Многострочные команды в одной строке</h2>
+<p>В <code>.bashrc</code> добавьте:</p>
+<pre>shopt -s cmdhist</pre>
+<p>Теперь многострочные команды будут сохраняться как одна строка.</p>
+
+<h2>5. Дополнительные советы</h2>
+<ul>
+<li>Ctrl-R в bash позволяет быстро искать команды в истории.</li>
+<li>Используйте <pre>history | grep "foo"</pre> для поиска конкретной команды.</li>
+<li>Команда <pre>cd -</pre> возвращает в предыдущую директорию.</li>
+<li>Нажатие <code>Esc</code> + <code>.</code> вставляет последний использованный объект команды. Пример: <code>cat /etc/apt/sources.list</code> → <code>rm</code> → <code>Esc</code> + <code>.</code> → <code>rm /etc/apt/sources.list</code>.</li>
+</ul>
+
+</body>
+</html>
+
