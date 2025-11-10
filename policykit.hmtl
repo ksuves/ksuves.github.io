@@ -102,6 +102,13 @@
       font-family: Consolas, monospace;
       font-size: 0.95em;
     }
+  footer {
+    font-size: 0.9em;
+    color: #555;
+    border-top: 1px solid #ddd;
+    margin-top: 2em;
+    padding-top: 1em;
+  }
   </style>
 </head>
 <body>
