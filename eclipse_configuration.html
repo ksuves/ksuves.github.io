@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Change Default Eclipse Preferences</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 800px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  ol, ul {
+    margin-left: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>How to Change Default Eclipse Preferences</h3>
+
+  <ol>
+    <li>Open a clean install of Eclipse and configure it from top to bottom.</li>
+    <li>Export all preferences to an <code>.epf</code> file.</li>
+    <li>Edit the resulting <code>.epf</code> file to remove the <code>/instance/</code> prefix from all property names.</li>
+    <li>Rename the <code>.epf</code> to <code>preferences.ini</code> and put it into <code>&lt;your_path&gt;/eclipse</code>.</li>
+    <li>
+      <ol type="a">
+        <li>Launch Eclipse with <code>-plugincustomization preferences.ini</code>.</li>
+        <li>Add to <code>eclipse.ini</code> before <code>-vmargs</code>:
+          <pre>-pluginCustomization
+&lt;your_path&gt;/eclipse/preferences.ini</pre>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</div>
+
+</body>
+</html>
+

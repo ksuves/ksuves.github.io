@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaussian 09 Installation</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 900px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  pre {
+    background: #f3f3f3;
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+  a { color: #1a0dab; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>Gaussian 09 Installation</h3>
+
+  <p>Steps for installation:</p>
+  <pre>
+CD="/path/to/g09_cd"
+MNTPNT="/mnt/g09_mntpnt"
+mount $CD $MNTPNT       # mount the G09 distribution
+export g09root="/opt/g09"
+cd $g09root
+gunzip -c $MNTPNT/tar/*.tgz | tar xvf -  # extract distribution
+groupadd g09
+chgrp -R g09 g09
+gpasswd -a user g09    # add users allowed to use G09
+cd g09
+./bsd/install
+export GAUSS_SCRDIR="/var/run/g09"  # temporary files directory
+mkdir $GAUSS_SCRDIR
+chgrp -R g09 $GAUSS_SCRDIR
+chmod -R g+w $GAUSS_SCRDIR
+source $g09root/g09/bsd/g09.login
+  </pre>
+
+  <p><strong>Running tests:</strong> The user must have write permissions in <code>$GAUSS_SCRDIR</code> and in the tests directory.</p>
+  <pre>
+cd $g09root/g09/tests/com
+for test in *.com; do g09 $test; echo "for $test : $?"; done &gt;&gt; results
+  </pre>
+  <p>The file <code>results</code> will contain exit codes for each test (0 = OK, non-zero = failure). Check <code>testN.log</code> for details.</p>
+
+  <p><strong>Environment variables:</strong> Add to <code>/etc/bash/bashrc</code> to make G09 available to all users:</p>
+  <pre>
+g09root="/opt/g09"
+GAUSS_SCRDIR="/var/run/g09"
+GAUSS_EXEDIR="$g09root/g09"
+PATH=$PATH:$GAUSS_EXEDIR
+export g09root GAUSS_EXEDIR GAUSS_SCRDIR PATH
+. $g09root/g09/bsd/g09.profile
+  </pre>
+
+  <p><strong>Notes for virtual machines:</strong> Some tests require SSE4 instructions. To enable in KVM with libvirt, ensure host CPU supports SSE4 and add:</p>
+  <pre>
+&lt;cpu&gt;
+      &lt;model&gt;qemu64&lt;/model&gt;
+      &lt;feature name="sse4.1" policy="require"/&gt;
+&lt;/cpu&gt;
+  </pre>
+  <p>More details can be found <a href="http://www.linux-kvm.org/page/Tuning_KVM" target="_blank">here</a>.</p>
+</div>
+
+</body>
+</html>
+

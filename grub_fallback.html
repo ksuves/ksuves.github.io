@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRUB Fallback and Kernel Panic Handling</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 800px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>Using GRUB Fallback and Panic Options</h3>
+
+  <p>
+    When rebuilding the kernel remotely, a kernel panic can be disastrous. GRUB provides the <strong>fallback</strong> and <strong>panic</strong> options to automatically reboot the machine if a panic occurs and to select an alternate boot entry (e.g., the previous stable kernel).
+  </p>
+
+  <p>Example GRUB configuration:</p>
+  <pre>
+default saved
+timeout 5
+fallback 1
+
+title Gentoo Linux
+root (hd0,4)
+kernel /boot/vmlinuz root=/dev/sda7 panic=5 nouveau.modeset=1 video=uvesafb:1280@800-32,mtrr:3,ywrap vga=0x318
+savedefault fallback
+
+title Gentoo Linux Old
+root (hd0,4)
+kernel /boot/vmlinuz.old root=/dev/sda7 nouveau.modeset=1 video=uvesafb:1280@800-32,mtrr:3,ywrap vga=0x318
+savedefault 0
+  </pre>
+
+  <p>
+    By default, <code>default</code> is 0. If you select entry 0 (new kernel), the fallback will be set to 1 (the old, verified kernel) for that boot. If a kernel panic occurs (triggered by <code>panic=5</code> after 5 seconds), GRUB will boot entry 1 instead.  
+    After booting the old kernel, <code>default</code> will remain 0, so the next boot will attempt the new kernel again.
+  </p>
+
+  <p>Note: In GRUB2, the <code>fallback</code> option does not exist and has been replaced with other mechanisms. Refer to the GRUB2 documentation for similar functionality.</p>
+</div>
+
+</body>
+</html>
+

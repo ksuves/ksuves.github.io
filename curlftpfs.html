@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Монтирование FTP как локальной файловой системы</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.6;
+    background: #f9f9f9;
+    color: #222;
+    margin: 0;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 800px;
+    margin: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    color: #444;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  a {
+    color: #0645ad;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <div id="wikipage" class="trac-content borderless">
+    <p>Если нам нужно полноценно править файлы с FTP-сервера и использовать для этого, например, любимый редактор <b>vim</b>, имеет смысл смонтировать FTP-шару как локальную файловую систему.</p>
+
+    <p>Делается это следующим образом:</p>
+    <pre>curlftpfs -o user=USERNAME:PASSWORD ftp://FTPHost/ MountPoint/</pre>
+
+    <p>Необходимо, чтобы <b>CONFIG_FUSE_FS</b> было включено в ядре и собран пакет <b>net-fs/curlftpfs</b>.</p>
+
+    <p>Надо сказать, что тот же <b>vim</b> умеет работать сам с файлами, лежащими на FTP, но делает это не особо удобно.</p>
+  </div>
+</div>
+
+</body>
+</html>
+

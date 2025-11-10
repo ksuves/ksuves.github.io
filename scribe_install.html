@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thrift, fb303, Scribe Installation</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 800px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  pre {
+    background: #f3f3f3;
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>Installing Thrift</h3>
+  <pre>
+USE="cpp" emerge =dev-libs/thrift-0.7.0
+mkdir /usr/local/include
+ln -s /usr/include/thrift /usr/local/include/thrift
+ln -s /usr/bin/thrift /usr/local/bin/thrift
+  </pre>
+
+  <h3>Installing fb303</h3>
+  <pre>
+cd /usr/local/include
+svn co http://svn.apache.org/repos/asf/thrift/trunk/contrib/fb303
+cd fb303
+./bootstrap.sh
+./configure
+make 
+make install
+  </pre>
+
+  <h3>Installing Scribe</h3>
+  <pre>
+git clone https://github.com/facebook/scribe
+./bootstrap.sh
+./configure CPPFLAGS="-DHAVE_INTTYPES_H -DHAVE_NETINET_IN_H -DBOOST_FILESYSTEM_VERSION=2"
+make
+sudo make install
+  </pre>
+</div>
+
+</body>
+</html>
+

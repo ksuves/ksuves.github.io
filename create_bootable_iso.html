@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Создание загрузочного ISO</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; color: #333; }
+h1 { color: #2c3e50; }
+pre { background: #ecf0f1; padding: 10px; border-radius: 5px; overflow-x: auto; }
+section { padding: 15px; background: #fff; border-radius: 5px; }
+a { color: #2980b9; text-decoration: none; }
+</style>
+</head>
+<body>
+<section>
+<h1>Создание загрузочного ISO</h1>
+<p>Создание ISO-образа с загрузчиком isolinux:</p>
+<pre><code>mkisofs -o ../test1.iso -b isolinux/isolinux.bin -c isolinux/boot.cat \
+-no-emul-boot -boot-load-size 4 -boot-info-table -l -R -r ../cd</code></pre>
+<p>Гайд: <a href="http://www.captain.at/howto-linux-boot-cd.php" target="_blank">Howto create bootable ISO</a></p>
+</section>
+</body>
+</html>
+

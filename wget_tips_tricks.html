@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wget Tips and Tricks</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 800px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  ol {
+    margin-left: 20px;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  a {
+    color: #1a0dab;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>wget Tips and Tricks</h3>
+
+  <p>Some useful wget features:</p>
+
+  <ol>
+    <li>
+      <strong>Filter downloads by extensions using -A (Accept) and -R (Reject):</strong>
+      <pre>
+wget -r -A.pdf http://example.com/
+wget -r -R.html http://example.com/
+      </pre>
+      <p>Recursively traverse the website <a href="http://example.com">http://example.com</a>. In the first case, download only PDF files; in the second, download everything except HTML files.</p>
+    </li>
+    
+    <li>
+      <strong>Check for broken links on a site:</strong>
+      <pre>
+wget --spider -r -o log.txt http://example.com
+      </pre>
+      <p>This makes wget behave like a "web spider": it recursively checks all links on the site and logs the results in <code>log.txt</code>.</p>
+    </li>
+    
+    <li>
+      <strong>Download files that require cookies (e.g., Sun JDK) without a browser:</strong>
+      <pre>
+wget --header='Cookie: gpw_e24=&lt;VALUE_OF_COOKIE&gt;' '&lt;DOWNLOAD_LINK&gt;'
+      </pre>
+      <ul>
+        <li><code>&lt;VALUE_OF_COOKIE&gt;</code> — the cookie value of <code>gpw_e24</code> (confirms license agreement).</li>
+        <li><code>&lt;DOWNLOAD_LINK&gt;</code> — the URL of the file required by <code>emerge</code>.</li>
+      </ul>
+      <p>You can specify a path and filename, or simply navigate to the desired folder and wget will save the file with the original server name.</p>
+    </li>
+  </ol>
+</div>
+
+</body>
+</html>
+

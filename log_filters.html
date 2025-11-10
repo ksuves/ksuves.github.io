@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Фильтрация логов sudo с syslog-ng</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 900px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  ul, ol {
+    margin-left: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>Фильтрация sudo сообщений в логах</h3>
+
+  <p><strong>Задача:</strong> каждые несколько секунд выполняется команда через sudo, и /var/log/messages забивается строками вроде:</p>
+
+  <pre>Aug 24 00:16:41 golf sudo:      ksu : TTY=unknown ; PWD=/home/ksu ; USER=root ; COMMAND=/usr/sbin/hddtemp /dev/sda -q
+Aug 24 00:16:41 golf sudo: pam_unix(sudo:session): session opened for user root by (uid=1000)</pre>
+
+  <p><strong>Решение:</strong></p>
+
+  <p>Первая строчка убирается добавлением в <code>/etc/sudoers</code>:</p>
+  <pre>Defaults !syslog</pre>
+
+  <p>Вторая строка фильтруется через syslog-ng:</p>
+  <pre># vim /etc/syslog-ng/syslog-ng.conf
+
+# Определяем destination для логов
+destination authlog { file("/var/log/auth.log"); };
+
+# Фильтр логов событий авторизации
+filter f_authpriv { facility(auth, authpriv); };
+
+# Фильтр логов с приоритетом info
+filter f_info { level(info); };
+
+# Отрицание предыдущих фильтров
+filter f_main { not level(info) or not facility(auth, authpriv); };
+
+# Логи событий авторизации с info в отдельный файл
+log { source(src); filter(f_authpriv); filter(f_info); destination(authlog); };
+
+# Всё остальное — в /var/log/messages и консоль
+log { source(src); filter(f_main); destination(messages); };
+log { source(src); filter(f_main); destination(console_all); };</pre>
+
+  <p>Или без изменения <code>/etc/sudoers</code>:</p>
+  <pre># Фильтр, отбрасывающий все сообщения от sudo
+filter f_main { not program("sudo"); };
+log { source(src); filter(f_main); destination(messages); };
+log { source(src); filter(f_main); destination(console_all); };</pre>
+
+  <p>Примеры фильтрации других демонов:</p>
+  <pre>destination messages { file("/var/log/messages"); };
+destination console_all { file("/dev/tty12"); };
+destination cron { file("/var/log/cron.log"); };
+destination pptp { file("/var/log/pptp.log"); };
+destination sshd { file("/var/log/sshd.log"); };
+
+filter f_cron { program("cron"); };
+filter f_pptp { program("pptp") or program("pppd"); };
+filter f_sshd { program("sshd"); };
+filter f_main { not program("cron") and not program("pppd")
+and not program("pptp") and not program("sshd"); };
+
+log { source(src); filter(f_cron); destination(cron); };
+log { source(src); filter(f_pptp); destination(pptp); };
+log { source(src); filter(f_sshd); destination(sshd); };
+log { source(src); filter(f_main); destination(messages); };
+log { source(src); destination(console_all); };</pre>
+
+</div>
+
+</body>
+</html>
+

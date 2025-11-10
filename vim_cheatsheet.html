@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vim Cheatsheet</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    padding: 20px;
+    line-height: 1.6;
+  }
+  .cheatsheet {
+    background: #fff;
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h2, h3 {
+    color: #333;
+  }
+  pre {
+    background: #f3f3f3;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+  ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="cheatsheet">
+  <h2>Vim Cheatsheet <em>(in development)</em></h2>
+
+  <h3>Hotkeys</h3>
+  <ul>
+    <li><strong>u</strong> - undo last command</li>
+    <li><strong>x</strong> - delete character under cursor</li>
+    <li><strong>X</strong> - delete character before cursor</li>
+    <li><strong>r</strong> - replace character under cursor</li>
+    <li><strong>p</strong> - paste after cursor</li>
+    <li><strong>P</strong> - paste before cursor</li>
+    <li><strong>.</strong> - repeat last action</li>
+    <li><strong>d</strong> - delete</li>
+    <li><strong>dd</strong> - delete line</li>
+    <li><strong>y</strong> - copy (yank)</li>
+    <li><strong>yy</strong> - copy line</li>
+    <li><strong>dw</strong> - delete word</li>
+    <li><strong>yw</strong> - copy word</li>
+    <li><strong>2yy</strong> - copy line twice</li>
+    <li><strong>0</strong> - move to start of line</li>
+    <li><strong>$</strong> - move to end of line</li>
+    <li><strong>A</strong> - insert at end of line</li>
+    <li><strong>i</strong> - insert before cursor</li>
+    <li><strong>I</strong> - insert at first non-blank character</li>
+    <li><strong>o</strong> - insert new line below</li>
+    <li><strong>O</strong> - insert new line above</li>
+    <li><strong>w</strong> - move forward by word</li>
+    <li><strong>b</strong> - move backward by word</li>
+    <li><strong>V</strong> - select entire line</li>
+    <li><strong>^</strong> - move to first non-blank character in line</li>
+    <li><strong>n, j, k, l</strong> - move cursor right, down, up, left</li>
+  </ul>
+
+  <h3>Command Line</h3>
+  <ul>
+    <li><strong>:e file</strong> - edit file</li>
+    <li><strong>:new file</strong> - create new file</li>
+    <li><strong>:vnew</strong> - create new file in vertical split</li>
+  </ul>
+
+  <h3>Search</h3>
+  <ul>
+    <li><strong>/word</strong> - search forward for word</li>
+    <li><strong>?word</strong> - search backward for word</li>
+    <li><strong>n</strong> - go to next search result</li>
+  </ul>
+</div>
+
+</body>
+</html>
+

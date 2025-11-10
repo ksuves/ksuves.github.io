@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Portage через Git</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; color: #333; }
+h1 { color: #2c3e50; }
+pre { background: #ecf0f1; padding: 10px; border-radius: 5px; overflow-x: auto; }
+section { padding: 15px; background: #fff; border-radius: 5px; }
+</style>
+</head>
+<body>
+<section>
+<h1>Portage через Git</h1>
+<p>Использование Git для управления деревом Portage:</p>
+<pre><code>cd /usr
+git clone --depth 1 git://git.calculate.ru/calculate/portage portage-git
+rm -rf portage
+mv portage-git portage
+echo 'SYNC="git://git.calculate.ru/calculate/portage"' &gt;&gt; /etc/make.conf</code></pre>
+</section>
+</body>
+</html>
+

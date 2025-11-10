@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>dd via SSH</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; color: #333; }
+h1 { color: #2c3e50; }
+pre { background: #ecf0f1; padding: 10px; border-radius: 5px; overflow-x: auto; }
+section { padding: 15px; background: #fff; border-radius: 5px; }
+</style>
+</head>
+<body>
+<section>
+<h1>dd via SSH</h1>
+<p>Копирование диска на удалённый сервер через SSH:</p>
+<pre><code>dd bs=1M if=/dev/sda | ssh username@backupserver.fqdn "dd of=/directory_of_backups_on_ssh_server/backupfile.img bs=1M"</code></pre>
+</section>
+</body>
+</html>
+

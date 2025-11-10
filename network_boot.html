@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PXE / Netboot Guide</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 900px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  ul, ol {
+    margin-left: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>PXE / Netboot Setup</h3>
+
+  <p>Необходимые элементы для организации загрузки по сети:</p>
+  <ul>
+    <li>DHCP сервер</li>
+    <li>TFTP сервер</li>
+    <li>Файл <code>pxelinux.0</code> и конфигурация для него, доступные через TFTP</li>
+    <li>Операционная система для загрузки (образ или формат, поддерживаемый PXELINUX)</li>
+  </ul>
+
+  <h4>Конфигурация DHCP</h4>
+  <p>DHCP сервер должен отдавать параметры <code>next-server</code> и <code>filename</code>.</p>
+  <pre>subnet 192.168.2.0 netmask 255.255.255.0 {
+	range 192.168.2.2 192.168.2.254;
+	option routers 192.168.2.1;
+	next-server 192.168.2.1;
+	filename "pxelinux.0";
+}</pre>
+
+  <p>Для работы на мосте:</p>
+  <pre>brctl setfd br0 0</pre>
+
+  <h4>Конфигурация TFTP</h4>
+  <pre>-N tftp
+-A INPUT -j tftp -p udp --dport 69
+-A tftp -j ACCEPT -s 192.168.2.0/24</pre>
+  <pre>chmod -R o+r /var/tftp</pre>
+
+  <h4>PXELINUX</h4>
+  <p>pxelinux - часть пакета <code>syslinux</code>. Корневая директория TFTP должна содержать <code>pxelinux.0</code> и папку <code>pxelinux.cfg</code> с конфигурациями.</p>
+
+  <pre>
+/pxelinux.cfg/01-88-99-aa-bb-cc-dd
+/pxelinux.cfg/C000025B
+...
+/pxelinux.cfg/default
+  </pre>
+
+  <p>Пример конфигурации pxelinux:</p>
+  <pre>LABEL memtest
+KERNEL sysres/memdisk
+APPEND initrd=memdisk/memtest.img floppy
+
+LABEL local
+KERNEL chain.c32
+APPEND hd0 0</pre>
+
+  <h4>Примеры модулей Syslinux</h4>
+  <ul>
+    <li>chain.c32 - загрузка с другого устройства</li>
+    <li>linux.c32 - загрузка ядра Linux</li>
+    <li>menu.c32 - формирование текстового меню</li>
+    <li>vesamenu.c32 - графическое меню</li>
+    <li>memdisk - загрузка образов дискет/ISO</li>
+  </ul>
+
+  <p>Пример загрузки ISO через memdisk:</p>
+  <pre>label pm
+kernel memdisk
+initrd http://192.168.2.1/boot/pmagic/pmagic-5.5.iso
+append iso vmalloc=256M</pre>
+
+  <p>Пример загрузки ядра с веб-сервера:</p>
+  <pre>label tiny
+kernel http://192.168.2.1/boot/tinycore/bzImage
+initrd http://192.168.2.1/boot/tinycore/tinycore.gz</pre>
+
+  <h3>Fedora Net Install</h3>
+  <pre>label f17_install
+kernel fedora/vmlinuz
+append initrd=fedora/initrd.img inst.repo=http://192.168.2.1/fedora</pre>
+  <pre>
+WEBSERV_DIR="/var/www/localhost/htdocs"
+cp /mnt/fedora/images/pxeboot/* /var/tftp/fedora/
+cp -r /mnt/fedora $WEBSERV_DIR/
+  </pre>
+
+  <h3>CentOS Net Install</h3>
+  <pre>label centos62
+kernel centos62/vmlinuz
+append initrd=centos62/initrd.img ip=dhcp noipv6 ksdevice=eth0 method=http://mirrors.sgu.ru/m/centos/6.2/os/x86_64/ lang=en_US keymap=us</pre>
+
+  <h3>openSUSE Net Install</h3>
+  <pre>label suse_install
+kernel suse/linux
+append initrd=suse/initrd install=http://192.168.2.1/suse</pre>
+  <pre>
+WEBSERV_DIR="/var/www/localhost/htdocs"
+mkdir /var/tftp/suse
+cd /var/tftp/suse
+wget http://download.opensuse.org/distribution/12.1/repo/oss/boot/$(arch)/loader/linux 
+wget http://download.opensuse.org/distribution/12.1/repo/oss/boot/$(arch)/loader/initrd
+cp -r /mnt/suse $WEBSERV_DIR/
+  </pre>
+</div>
+
+</body>
+</html>
+

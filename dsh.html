@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSH (Distributed Shell) Guide</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 700px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  blockquote {
+    background: #f0f0f0;
+    border-left: 4px solid #ccc;
+    margin: 1em 0;
+    padding: 0.5em 1em;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>DSH (Distributed Shell) Guide</h3>
+
+  <p><strong>Задача:</strong> выполнить одну команду на нескольких компьютерах одновременно.</p>
+
+  <p><strong>Решение:</strong></p>
+  <blockquote>
+    <p>DSH (Distributed Shell), пакет <code>app-shells/dsh</code>. Выполнение выглядит так:</p>
+    <pre>dsh -r ssh -g all -M "command"</pre>
+    <p>где <code>all</code> — имя группы компьютеров. Таких групп можно создавать сколько угодно в файлах <code>/etc/dsh/group/</code> или <code>$HOME/.dsh/group/</code>.<br>
+    Опция <code>-M</code> заставит отображать имя машины при выводе ответа на команду (имя берется из конфигурационного файла DSH, а не из <code>hostname</code> машины).</p>
+
+    <p>Пример содержимого <code>/etc/dsh/group/all</code>:</p>
+    <pre>192.168.1.104
+vesna@192.168.1.106
+192.168.1.113</pre>
+  </blockquote>
+
+  <p>З.Ы.Ы. В зависимости от глобальности требований, возможно, имеет смысл взглянуть на пакеты <code>net-misc/cfengine</code>, <code>app-admin/puppet</code> и <code>app-admin/chef</code>.</p>
+</div>
+
+</body>
+</html>

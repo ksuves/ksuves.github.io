@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Перегрузка переменных для пакетов</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; color: #333; }
+h1 { color: #2c3e50; }
+pre { background: #ecf0f1; padding: 10px; border-radius: 5px; overflow-x: auto; }
+section { padding: 15px; background: #fff; border-radius: 5px; }
+a { color: #2980b9; text-decoration: none; }
+</style>
+</head>
+<body>
+<section>
+<h1>Перегрузка любых переменных из /etc/make.conf</h1>
+<p>Создайте для пакета файл:</p>
+<pre><code>/etc/portage/env/category_name/package_name</code></pre>
+<p>Пропишите туда необходимые переменные, например CFLAGS, CXXFLAGS или LINGUAS.</p>
+<p>Статья с описанием: <a href="http://mrcat.ru/advanced-portage" target="_blank">http://mrcat.ru/advanced-portage</a></p>
+</section>
+</body>
+</html>
+

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSH Cheatsheet</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 800px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  ol {
+    margin-left: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <h3>SSH Cheatsheet</h3>
+
+  <p>Некоторые возможности, что-то вроде cheatsheet.</p>
+
+  <ol>
+    <li>
+      Организовать доступ по ключам (скопировать публичный):
+      <pre>ssh-copy-id user@host</pre>
+      Второй вариант (для сравнения):
+      <pre>cat ~/.ssh/id_rsa.pub | ssh user@host "mkdir ~/.ssh; cat &gt;&gt; ~/.ssh/authorized_keys"</pre>
+    </li>
+    <li>
+      ~/.ssh/config — список хостов:
+      <pre>host %HOST%
+    Hostname %HOSTNAME%
+    Port %PORT%
+    user %USER%
+    IdentityFile ~/.ssh/some_id_rsa</pre>
+      После чего достаточно будет <code>ssh %HOST%</code>.
+    </li>
+    <li>
+      Монтирование средствами SSH:
+      <pre>sshfs user@host:/path/to/folder /path/to/mount/point</pre>
+    </li>
+    <li>
+      Смотрим видео, слушаем музыку на удаленном хосте:
+      <pre>ssh user@host cat film.avi | mplayer -</pre>
+    </li>
+    <li>
+      Запустить X-приложение на удаленном хосте:
+      <pre>ssh -Y user@host very_cool_app</pre>
+      Для большей безопасности использовать <code>-X</code>.
+    </li>
+    <li>
+      Постучаться по SSH к host2 через host1:
+      <pre>ssh -t user1@host1 ssh user2@host2</pre>
+    </li>
+    <li>
+      Сделать diff на host1 и host2:
+      <pre>diff &lt;(ssh host1 'cat foo') &lt;(ssh host2 'cat foo')</pre>
+      Совет: для таких целей лучше использовать vimdiff.
+    </li>
+  </ol>
+</div>
+
+</body>
+</html>
+

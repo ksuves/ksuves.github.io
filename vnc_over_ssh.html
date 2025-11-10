@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Доступ к VNC через SSH</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 700px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <div id="wikipage" class="trac-content borderless">
+    <h3>Доступ к рабочему столу через VNC поверх SSH</h3>
+    <p>
+      Нужен VNC-сервер и VNC-клиент. В качестве VNC-сервера x11vnc показал себя лучше, чем tigervnc с Openbox.  
+      Цель — получить доступ к рабочему столу <b>server</b> с машины <b>client</b>.
+    </p>
+
+    <pre>client$ ssh -L 5900:localhost:5900 -l user server</pre>
+
+    <pre>user@server$ startx
+# На машине server от пользователя user должны быть подняты иксы.
+# Если они уже запущены другим пользователем, можно использовать:
+startx -- :&lt;№&gt;</pre>
+
+    <pre>user@server$ x11vnc -localhost -display :0 -nopw
+# Соответственно, -display :&lt;№&gt;</pre>
+
+    <pre>client$ vncviewer localhost</pre>
+
+    <p>Все =)</p>
+  </div>
+</div>
+
+</body>
+</html>
+

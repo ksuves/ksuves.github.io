@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Быстрое создание больших файлов</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; color: #333; }
+h1 { color: #2c3e50; }
+pre { background: #ecf0f1; padding: 10px; border-radius: 5px; overflow-x: auto; }
+section { padding: 15px; background: #fff; border-radius: 5px; }
+</style>
+</head>
+<body>
+<section>
+<h1>Быстрое создание больших файлов</h1>
+<p>Создание пустого большого файла через dd или truncate:</p>
+<pre><code>dd if=/dev/zero of=disk.img bs=1 count=0 seek=1G
+truncate -s 2G &lt;disk.img&gt;</code></pre>
+</section>
+</body>
+</html>
+

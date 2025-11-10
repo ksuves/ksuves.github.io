@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Настройка SSH VPN через tap интерфейс</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .wikipage {
+    background: #fff;
+    max-width: 900px;
+    margin: auto;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 6px;
+    color: #444;
+  }
+  pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 0.95em;
+  }
+  ol {
+    margin: 1em 0 1em 1.2em;
+  }
+  li {
+    margin-bottom: 0.8em;
+  }
+</style>
+</head>
+<body>
+
+<div class="wikipage">
+  <div id="wikipage" class="trac-content borderless">
+    <h3>Настройка клиента</h3>
+    <ol>
+      <li>Правим <code>/etc/conf.d/net</code>:
+        <pre>config_tap0="192.168.1.2/24"
+
+preup() {
+    case ${IFACE} in
+        tap0)
+            ssh -o Tunnel=ethernet -S /var/run/ssh-vpn-ctrl -M -f -w 0 volvo true
+            sleep 5
+            ;;
+    esac
+    return 0
+}
+
+postup() {
+    case ${IFACE} in
+        tap0)
+            brctl addif br0 tap0
+            ;;
+    esac
+    return 0
+}
+
+postdown() {
+    case ${IFACE} in
+        tap0)
+            # когда vpn не нужен, закрываем ssh
+            ssh -S /var/run/ssh-vpn-ctrl -2 volvo
+            ps aux | grep "/var/run/ssh-vpn-ctrl" | grep -v grep | awk -F " " '{print $2}' | xargs kill
+            ;;
+    esac
+    return 0
+}</pre>
+        Здесь <b>volvo</b> — имя сервера, <b>-w 0</b> — указание на tap0, <b>/var/run/ssh-vpn-ctrl</b> — сокет для создания туннеля. Строка в <code>postup</code> добавляет интерфейс в мост при необходимости.
+      </li>
+      <li>Готовим сервис для создания подключения:
+        <pre>ln -s /etc/init.d/net.lo /etc/init.d/net.tap0</pre>
+        Можно добавить его в автозагрузку:
+        <pre>rc-update add net.tap0 default</pre>
+      </li>
+      <li>Готовим ключ для входа на сервер по SSH:
+        <pre>ssh-keygen</pre>
+        В результате будет файл <code>id_rsa</code> и <code>id_rsa.pub</code>. Последний понадобится для сервера.
+      </li>
+    </ol>
+
+    <h3>Настройка сервера</h3>
+    <ol>
+      <li>Берем файл <code>id_rsa.pub</code> с клиента и добавляем в авторизованные ключи SSH:
+        <pre>cat id_rsa.pub >> ~/.ssh/authorized_keys</pre>
+      </li>
+      <li>Дописываем в начало строки с ключом:
+        <pre>tunnel="0",command="/etc/init.d/net.tap0 restart"</pre>
+      </li>
+      <li>В конфиге SSH <code>/etc/ssh/sshd_config</code> разрешаем туннели:
+        <pre>PermitTunnel yes</pre>
+        И перезапускаем sshd:
+        <pre>/etc/init.d/sshd restart</pre>
+      </li>
+      <li>Правим <code>/etc/conf.d/net</code> на сервере:
+        <pre>config_tap0=( "192.168.1.1/24" )
+routes_tap0=(
+        "192.168.1.0/24 via 192.168.1.1"
+)
+
+preup() {
+    echo `date`: postup ${IFACE} >> /var/log/postup
+    case ${IFACE} in
+        tap0)
+            ip link set up dev tap0
+            brctl addif br0 tap0
+            ;;
+    esac
+    return 0
+}</pre>
+      </li>
+    </ol>
+
+    <p>Для поднятия туннеля на клиенте используем команду:</p>
+    <pre>/etc/init.d/net.tap0 start</pre>
+  </div>
+</div>
+
+</body>
+</html>
+
